@@ -323,7 +323,7 @@ kAHPropertyRequestPlaybackError = 2;
                        withTimeout:1.0f
                                tag:kAHRequestTagPlay];
         [self.mainSocket readDataToData:[@"\r\n\r\n" dataUsingEncoding:NSUTF8StringEncoding]
-                            withTimeout:2.0f
+                            withTimeout:15.0f
                                     tag:kAHRequestTagPlay];
     } else {
         NSLog(@"Error connecting socket for /play: %@", error);
@@ -333,6 +333,7 @@ kAHPropertyRequestPlaybackError = 2;
 //  alternates /scrub and /playback-info
 - (void)infoRequest
 {
+    [self writeOK];
     NSString                *nextRequest = @"/playback-info";
     NSMutableURLRequest     *request = nil;
     
@@ -575,6 +576,13 @@ kAHPropertyRequestPlaybackError = 2;
         
         NSLog(@"read data for /play reply");
     }
+}
+
+- (void)writeOK
+{
+    NSData *okData = [@"ok" dataUsingEncoding:NSUTF8StringEncoding];
+    [self.mainSocket writeData:okData withTimeout:10.0f tag:kAHHeartBeatTag];
+    [self.reverseSocket writeData:okData withTimeout:10.0f tag:kAHHeartBeatTag];
 }
 
 - (void)writestuff {
